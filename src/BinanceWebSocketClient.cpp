@@ -51,19 +51,24 @@ void BinanceWebSocketClient::disconnect() {
     stopping_ = true;
     connected_ = false;
     
+    // Close the WebSocket gracefully
     if (ws_ && ws_->next_layer().next_layer().is_open()) {
         try {
             boost::system::error_code ec;
             ws_->close(websocket::close_code::normal, ec);
-            // Don't treat close errors as fatal
+            // Don't treat close errors as fatal during shutdown
         } catch (const std::exception& e) {
-            // Ignore disconnect exceptions
+            // Ignore disconnect exceptions during shutdown
         }
     }
     
+    // Wait for the read thread to finish
     if (io_thread_.joinable()) {
         io_thread_.join();
     }
+    
+    // Reset the WebSocket pointer to ensure clean state
+    ws_.reset();
 }
 
 void BinanceWebSocketClient::connectWebSocket(const std::string& host, const std::string& port, const std::string& target) {
@@ -115,8 +120,19 @@ void BinanceWebSocketClient::run() {
 void BinanceWebSocketClient::readLoop() {
     beast::flat_buffer buffer;
     
-    while (connected_ && !stopping_) {
+    while (!stopping_ && connected_) {
         try {
+            // Check if we should stop before attempting to read
+            if (stopping_ || !connected_) {
+                break;
+            }
+            
+            // Check if WebSocket is still open
+            if (!ws_ || !ws_->next_layer().next_layer().is_open()) {
+                std::cout << "WebSocket connection closed" << std::endl;
+                break;
+            }
+            
             auto bytes_read = ws_->read(buffer);
             
             std::string message = beast::buffers_to_string(buffer.data());
@@ -152,12 +168,22 @@ void BinanceWebSocketClient::readLoop() {
             }
             
         } catch (const beast::system_error& se) {
-            if (se.code() != websocket::error::closed) {
+            if (se.code() == websocket::error::closed || stopping_) {
+                std::cout << "WebSocket closed normally" << std::endl;
+                break;
+            } else {
                 std::cerr << "WebSocket read error: " << se.what() << std::endl;
+                break;
+            }
+        } catch (const std::exception& e) {
+            if (!stopping_) {
+                std::cerr << "Unexpected error in read loop: " << e.what() << std::endl;
             }
             break;
         }
     }
+    
+    connected_ = false;
 }
 
 void BinanceWebSocketClient::handleDisconnection() {

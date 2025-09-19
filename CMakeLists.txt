@@ -8,22 +8,38 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Boost REQUIRED)
 find_package(OpenSSL REQUIRED)
 
-# Add executable
-add_executable(turbobook src/main.cpp src/OrderBook.cpp src/OrderBookSimulator.cpp src/OrderBookAnalyzer.cpp src/BinanceWebSocketClient.cpp src/AlpacaWebSocketClient.cpp)
+# Common source files
+set(COMMON_SOURCES src/OrderBook.cpp src/OrderBookAnalyzer.cpp)
 
-# Include directories
-target_include_directories(turbobook PRIVATE include ${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+# Add menu executable
+add_executable(turbobook src/main.cpp)
 
-# Link libraries
-target_link_libraries(turbobook PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+# Add separate executables
+add_executable(turbobook-binance src/main_binance.cpp ${COMMON_SOURCES} src/BinanceWebSocketClient.cpp)
+add_executable(turbobook-alpaca src/main_alpaca.cpp ${COMMON_SOURCES} src/AlpacaWebSocketClient.cpp)
 
-# Enable warnings
+# Include directories for all executables
+target_include_directories(turbobook PRIVATE include)
+target_include_directories(turbobook-binance PRIVATE include ${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+target_include_directories(turbobook-alpaca PRIVATE include ${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+
+# Link libraries (menu app doesn't need networking libraries)
+target_link_libraries(turbobook-binance PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(turbobook-alpaca PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+
+# Enable warnings for all executables
 if(MSVC)
     target_compile_options(turbobook PRIVATE /W4)
+    target_compile_options(turbobook-binance PRIVATE /W4)
+    target_compile_options(turbobook-alpaca PRIVATE /W4)
 else()
     target_compile_options(turbobook PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(turbobook-binance PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(turbobook-alpaca PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-# Add tests
-enable_testing()
-add_subdirectory(tests)
+# Add tests if directory exists
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+    enable_testing()
+    add_subdirectory(tests)
+endif()
