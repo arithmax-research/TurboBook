@@ -3,6 +3,7 @@
 #include "Order.h"
 #include <deque>
 #include <memory>
+#include <algorithm>
 
 class PriceLevel {
 public:
