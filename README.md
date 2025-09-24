@@ -1,8 +1,24 @@
+
+![TurboBook Architecture](tb.jpg)
+
 # TurboBook
 
 A high-performance C++ framework for real-time order book analysis and exploitation of market inefficiencies. This project explores the detection and analysis of order book imperfections such as imbalances and price mishaps using direct broker WebSocket feeds.
 
 ## Project Overview
+
+<div align="center">
+  <img src="tb.jpg" alt="TurboBook Architecture" width="600">
+  
+  ![C++17](https://img.shields.io/badge/C%2B%2B-17-%2300599C?logo=c%2B%2B)
+  ![Latency](https://img.shields.io/badge/Latency-7.89μs-blueviolet)
+  ![Throughput](https://img.shields.io/badge/Throughput-126k_ops%2Fs-success)
+  ![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
+  ![License](https://img.shields.io/badge/License-Research-purple)
+</div>
+
+# TurboBook
+
 
 TurboBook is a promising exploration into receiving, analyzing, and exploiting order book imperfections like imbalances and price mishaps using broker WebSockets and C++. The framework focuses on ultra-low latency processing of real-time market data to identify and capitalize on fleeting market opportunities.
 
