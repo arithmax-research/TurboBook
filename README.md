@@ -1,14 +1,6 @@
 
-![TurboBook Architecture](tb.jpg)
-
-# TurboBook
-
-A high-performance C++ framework for real-time order book analysis and exploitation of market inefficiencies. This project explores the detection and analysis of order book imperfections such as imbalances and price mishaps using direct broker WebSocket feeds.
-
-## Project Overview
-
 <div align="center">
-  <img src="tb.jpg" alt="TurboBook Architecture" width="600">
+  <img src="tb.jpg" alt="TurboBook Architecture" width="300" height="300">
   
   ![C++17](https://img.shields.io/badge/C%2B%2B-17-%2300599C?logo=c%2B%2B)
   ![Latency](https://img.shields.io/badge/Latency-7.89μs-blueviolet)
