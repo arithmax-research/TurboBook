@@ -1,4 +1,4 @@
-ghocmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.16)
 project(TurboBook VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -27,15 +27,18 @@ add_executable(turbobook src/main.cpp)
 # Add separate executables
 add_executable(turbobook-binance src/main_binance.cpp ${COMMON_SOURCES} src/BinanceWebSocketClient.cpp)
 add_executable(turbobook-alpaca src/main_alpaca.cpp ${COMMON_SOURCES} src/AlpacaWebSocketClient.cpp)
+add_executable(turbobook-multisymbol src/main_multisymbol.cpp ${COMMON_SOURCES} src/BinanceWebSocketClient.cpp)
 
 # Include directories for all executables
 target_include_directories(turbobook PRIVATE include)
 target_include_directories(turbobook-binance PRIVATE include ${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
 target_include_directories(turbobook-alpaca PRIVATE include ${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+target_include_directories(turbobook-multisymbol PRIVATE include ${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
 
 # Link libraries (menu app doesn't need networking libraries)
 target_link_libraries(turbobook-binance PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 target_link_libraries(turbobook-alpaca PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(turbobook-multisymbol PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
 # Enable warnings for all executables
 if(MSVC)
