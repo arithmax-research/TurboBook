@@ -1,8 +1,18 @@
-cmake_minimum_required(VERSION 3.16)
+ghocmake_minimum_required(VERSION 3.16)
 project(TurboBook VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Prefer clang over gcc to avoid GCC 13 internal compiler error (ICE) 
+# with Boost.Beast template instantiations in WebSocket code
+if(NOT CMAKE_CXX_COMPILER)
+    find_program(CLANG_CXX clang++)
+    if(CLANG_CXX)
+        set(CMAKE_CXX_COMPILER ${CLANG_CXX})
+        message(STATUS "Using clang++ as C++ compiler")
+    endif()
+endif()
 
 # Find Boost
 find_package(Boost REQUIRED)
